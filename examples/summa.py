@@ -14,17 +14,28 @@ from pytato import (find_distributed_partition, generate_code_for_partition,
 
 from arraycontext import PytatoPyOpenCLArrayContext
 from pyopencl.tools import ImmediateAllocator
+import arraycontext
+import pytools
 
 class MyArrayContext(PytatoPyOpenCLArrayContext):
+
     def transform_loopy_program(self, t_unit):
         #print(t_unit)
         return t_unit
+
 
 # Make a new tag type
 # Slap onto each piece of the pytato arrays
 # Mapper global to local.
 # Sends and receives tag name (Triple) (sender, receiver, "comm_tag")
 #   -> For each such triple, there must be exactly one send and one receive
+
+class MyTagType(pytools.tag.Tag):
+    def __init__(self, sender, receiver, comm_num):
+        self.comm_num = comm_num
+        self.receiver = receiver
+        self.sender = sender
+        # In each communication we only need to know where to go, who to send to and which send this is.
 
 class Mapper:
     def __init__(self):
@@ -70,22 +81,6 @@ def main():
     A_blocks = slice_into_blocks(actx.from_numpy(A_in), blocksize=bs_A)
     B_blocks = slice_into_blocks(actx.from_numpy(B_in), blocksize=bs_B)
 	
-    #A_in = np.array([[[rng.integers(100, size=(2,1)) for i in range(2)] for j in range(2)] for k in range(2)])
-    #B_in = np.array([[[rng.integers(100, size=(2,1)) for i in range(2)] for j in range(2)] for k in range(2)])
-    #c_out = np.array([[rng.integers(100, size=(2,2)) for i in range(2)] for j in range(2)])
-
-    #print(type(c_out[0,0]))
-    #from pytools.obj_array import make_obj_array
-    #A_in_dev = make_obj_array([[[cl_array.to_device(queue, A_in[i][j][k]) for i in range(2)] for j in range(2)] for k in range(2)])
-    #B_in_dev = np.array([[[cl_array.to_device(queue, B_in[i][j][k]) for i in range(2)] for j in range(2)] for k in range(2)])
-    #c_out_dev = np.array([[cl_array.to_device(queue, c_out[i][j]) for i in range(2)] for j in range(2)])
-    #pu.db
-
-    #A_data_wrappers = np.array([[[pt.make_data_wrapper(A_in_dev[i][j][k]) for i in range(2)] for j in range(2)] for k in range(2)])
-    #B_data_wrappers = np.array([[[pt.make_data_wrapper(B_in_dev[i][j][k]) for i in range(2)] for j in range(2)] for k in range(2)])
-
-    #data_wrappers = np.array([[pt.make_data_wrapper(c_out_dev[i][j]) for i in range(2)] for j in range(2)])
-    #print(type(data_wrappers[0,0]))
 
     def outer(a, b):
         return a.reshape(-1, 1) * b.reshape(1, -1)
@@ -99,66 +94,18 @@ def main():
             iproc = ...
             for k_op_block in range(n_outer_product_blocks):
                 for k_op in range(n_outer_products):
+                    input1 = A_blocks[ib, k_op_block][:, k_op]
+                    input2 = B_blocks[k_op_block, jb][k_op]
                     op = outer(
                         A_blocks[ib, k_op_block][:, k_op],
                         B_blocks[k_op_block, jb][k_op])
                     C_blocks[ib, jb] = C_blocks[ib, jb] + op
+                    print("Name: ", "Ain", type(A_blocks[0,0][0,0]))
+                    t = input1.tagged([MyTagType(1, "me", k_op + k_op_block*n_outer_products)])
+                    print(t)
 
     C_blocks_host = actx.to_numpy(actx.freeze(C_blocks))
-
+    print(C_blocks_host)
     
-    #for i in range(4):
-    #   for k in range(2):
-    #       processor_row = i // (2)
-    #       processor_col = i % 2
-    #       a = A_data_wrappers[processor_row,processor_col,k] # This is a 2x1 column array
-    #       b = B_data_wrappers[k, processor_col, processor_row] # This is a 2x1 row array
-
-    #       data_wrappers[processor_row, processor_col] += pt.dot(a, b.T) # outer product. 
-
-
-    #"""
-    #     for j in range(processor_rows):
-    #         if j == p_row:
-    #            break
-
-
-    #          target = p_row*3+ p_col+j
-    #          mytag_a = (main, "a", k, target) # loc, type, number, target
-
-    #          target = (p_row+1)*3 + p_col
-    #          mytag_b = (main, "b", k, target)
-
-
-
-
-    #          # Send your row data to all the processors in your
-    #          # current processors' column
-    #          stapled_distributed_send(a, dest_rank=(p_row*3 + p_col + j),
-    #                   comm_tag=mytag_a,
-    #                   stapled_to=make_distributed_recv(src_rank=(p_row*3 + p_col + j),
-    #                        comm_tag=mytag_a, shape=(3,3), dtype=int))
-
-
-    #           # Send all your column data to the processors in the
-    #           # row of the current processor
-
-    #           stapled_distributed_send(b, dest_rank=((p_row+1)*3+ p_col +j),comm_tag=mytag_b,
-    #            stapled_to=make_distributed_recv(src_rank=((p_row+1)*3+ p_col +j),
-    #                comm_tag=mytag_b, shape=(3,3), dtype=int))
-
-    #            # Compute your update value.
-    #            c = c + pt.dot(a, b.T)
-    # """
-    # outs = pt.make_dict_of_named_array({"out: "+str(i): data_wrappers[i // 2][i % 2] for i in range(4)})
-    # distributed_parts = find_distributed_partition(comm, outs)
-    # print(distributed_parts)
-
-    # #prg_per_partition = generate_code_for_partition(c)
-
-    # pt.verify_distributed_partition(comm, c)
-
-    # print("Rank: ",rank,"out: ", context["out" + str(rank)].get(queue))
-
 if __name__ == "__main__":
     main()
