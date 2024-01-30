@@ -1,0 +1,73 @@
+digraph computation {
+    node [shape=rectangle]
+    array -> send[style=dotted, label="_pt_dist_id_1"]
+    array_1 [label=<<table border="0" cellborder="1" cellspacing="0">
+    <tr><td colspan="2" border="0">Placeholder</td></tr><tr><td border="0">addr:</td><td border="0"><FONT FACE='monospace'>0x7fbfaf65d000</FONT></td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(4,_4)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">tags:</td><td border="0"><FONT FACE='monospace'>{}</FONT></td></tr><tr><td border="0">axes:</td><td border="0"><FONT FACE='monospace'>(Axis(tags=frozenset()),_Axis(tags=frozenset()))</FONT></td></tr><tr><td border="0">name:</td><td border="0"><FONT FACE='monospace'>_pt_dist_id</FONT></td></tr></table>> style=filled fillcolor=deepskyblue]
+    recv -> array_1 [style=dotted]
+    array_2 -> send_0[style=dotted, label="_pt_dist_id_2"]
+    array_0 -> array_2 [label="_in0"]
+    array_1 -> array_2 [label="_in1"]
+    array_5 [label=<<table border="0" cellborder="1" cellspacing="0">
+    <tr><td colspan="2" border="0">Placeholder</td></tr><tr><td border="0">addr:</td><td border="0"><FONT FACE='monospace'>0x7fbfaf65d180</FONT></td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(4,_4)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">tags:</td><td border="0"><FONT FACE='monospace'>{}</FONT></td></tr><tr><td border="0">axes:</td><td border="0"><FONT FACE='monospace'>(Axis(tags=frozenset()),_Axis(tags=frozenset()))</FONT></td></tr><tr><td border="0">name:</td><td border="0"><FONT FACE='monospace'>_pt_dist_id_0</FONT></td></tr></table>> style=filled fillcolor=deepskyblue]
+    recv_0 -> array_5 [style=dotted]
+    array_3 -> array_4 [label="_in0"]
+    array_1 -> array_4 [label="_in1"]
+    array_4 -> array_6 [label="_in0"]
+    array_5 -> array_6 [label="_in1"]
+    array_6 -> out_0
+    subgraph cluster_0 {
+        style=dashed
+        label="0"
+        array [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">DataWrapper</td></tr><tr><td border="0">addr:</td><td border="0"><FONT FACE='monospace'>0x7fbfaf65cf40</FONT></td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(4,_4)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">tags:</td><td border="0"><FONT FACE='monospace'>{}</FONT></td></tr><tr><td border="0">data:</td><td border="0"><FONT FACE='monospace'>[[_2_33_54_79]<br/>_[22_49__3__3]<br/>_[52_61_31_71]<br/>_[76_24_54_75]]</FONT></td></tr></table>> style=filled fillcolor=deepskyblue]
+        send [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">DistributedSend</td></tr><tr><td border="0">dest_rank:</td><td border="0"><FONT FACE='monospace'>0</FONT></td></tr><tr><td border="0">comm_tag:</td><td border="0"><FONT FACE='monospace'>42</FONT></td></tr></table>> style=filled fillcolor=white]
+        array -> _pt_dist_id_1
+        subgraph cluster_Part_outputs {
+            node [shape=ellipse]
+            label="Part outputs"
+            _pt_dist_id_1 [label="_pt_dist_id_1"]
+        }
+    }
+    subgraph cluster_1 {
+        style=dashed
+        label="1"
+        recv [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">DistributedRecv</td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(4,_4)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">src_rank:</td><td border="0"><FONT FACE='monospace'>0</FONT></td></tr><tr><td border="0">comm_tag:</td><td border="0"><FONT FACE='monospace'>42</FONT></td></tr></table>> style=filled fillcolor=white]
+        array_0 [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">DataWrapper</td></tr><tr><td border="0">addr:</td><td border="0"><FONT FACE='monospace'>0x7fbfaf65cfa0</FONT></td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(4,_4)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">tags:</td><td border="0"><FONT FACE='monospace'>{}</FONT></td></tr><tr><td border="0">data:</td><td border="0"><FONT FACE='monospace'>[[_2_33_54_79]<br/>_[22_49__3__3]<br/>_[52_61_31_71]<br/>_[76_24_54_75]]</FONT></td></tr></table>> style=filled fillcolor=deepskyblue]
+        array_2 [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">IndexLambda</td></tr><tr><td border="0">addr:</td><td border="0"><FONT FACE='monospace'>0x7fbfaf61fdf0</FONT></td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(4,_4)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">tags:</td><td border="0"><FONT FACE='monospace'>{}</FONT></td></tr><tr><td border="0">expr:</td><td border="0"><FONT FACE='monospace'>_in0[_0,__1]_+__in1[_0,__1]</FONT></td></tr></table>> style=filled fillcolor=white]
+        send_0 [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">DistributedSend</td></tr><tr><td border="0">dest_rank:</td><td border="0"><FONT FACE='monospace'>0</FONT></td></tr><tr><td border="0">comm_tag:</td><td border="0"><FONT FACE='monospace'>43</FONT></td></tr></table>> style=filled fillcolor=white]
+        array_2 -> _pt_dist_id_2
+        subgraph cluster_Part_outputs {
+            node [shape=ellipse]
+            label="Part outputs"
+            _pt_dist_id_2 [label="_pt_dist_id_2"]
+        }
+    }
+    subgraph cluster_2 {
+        style=dashed
+        label="2"
+        recv_0 [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">DistributedRecv</td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(4,_4)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">src_rank:</td><td border="0"><FONT FACE='monospace'>0</FONT></td></tr><tr><td border="0">comm_tag:</td><td border="0"><FONT FACE='monospace'>43</FONT></td></tr></table>> style=filled fillcolor=white]
+        array_3 [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">DataWrapper</td></tr><tr><td border="0">addr:</td><td border="0"><FONT FACE='monospace'>0x7fbfaf65d0c0</FONT></td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(4,_4)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">tags:</td><td border="0"><FONT FACE='monospace'>{}</FONT></td></tr><tr><td border="0">data:</td><td border="0"><FONT FACE='monospace'>[[_2_33_54_79]<br/>_[22_49__3__3]<br/>_[52_61_31_71]<br/>_[76_24_54_75]]</FONT></td></tr></table>> style=filled fillcolor=deepskyblue]
+        array_4 [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">IndexLambda</td></tr><tr><td border="0">addr:</td><td border="0"><FONT FACE='monospace'>0x7fbfaf61fd80</FONT></td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(4,_4)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">tags:</td><td border="0"><FONT FACE='monospace'>{}</FONT></td></tr><tr><td border="0">expr:</td><td border="0"><FONT FACE='monospace'>_in0[_0,__1]_+__in1[_0,__1]</FONT></td></tr></table>> style=filled fillcolor=white]
+        array_6 [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">IndexLambda</td></tr><tr><td border="0">addr:</td><td border="0"><FONT FACE='monospace'>0x7fbfaf61fe60</FONT></td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(4,_4)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">tags:</td><td border="0"><FONT FACE='monospace'>{}</FONT></td></tr><tr><td border="0">expr:</td><td border="0"><FONT FACE='monospace'>_in0[_0,__1]_+__in1[_0,__1]</FONT></td></tr></table>> style=filled fillcolor=white]
+        array_6 -> out
+        subgraph cluster_Part_outputs {
+            node [shape=ellipse]
+            label="Part outputs"
+            out [label="out"]
+        }
+    }
+    subgraph cluster_Overall_outputs {
+        node [shape=ellipse]
+        label="Overall outputs"
+        out_0 [label="out"]
+    }
+}

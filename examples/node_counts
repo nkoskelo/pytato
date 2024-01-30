@@ -1,0 +1,26 @@
+new test
+CommunicationOpIdentifier(src_rank=0, dest_rank=3, comm_tag=(<function main at 0x7fe3ec997d90>, 'x')),0
+CommunicationOpIdentifier(src_rank=1, dest_rank=0, comm_tag=(<function main at 0x7fe3ec997d90>, 'x')),0
+CommunicationOpIdentifier(src_rank=0, dest_rank=3, comm_tag=(<function main at 0x7fe3ec997d90>, 'y')),1
+CommunicationOpIdentifier(src_rank=2, dest_rank=1, comm_tag=(<function main at 0x7fe3ec997d90>, 'x')),0
+CommunicationOpIdentifier(src_rank=1, dest_rank=0, comm_tag=(<function main at 0x7fe3ec997d90>, 'y')),1
+CommunicationOpIdentifier(src_rank=3, dest_rank=2, comm_tag=(<function main at 0x7fe3ec997d90>, 'x')),0
+CommunicationOpIdentifier(src_rank=2, dest_rank=1, comm_tag=(<function main at 0x7fe3ec997d90>, 'y')),1
+CommunicationOpIdentifier(src_rank=3, dest_rank=2, comm_tag=(<function main at 0x7fe3ec997d90>, 'y')),1
+new test
+CommunicationOpIdentifier(src_rank=0, dest_rank=2, comm_tag=(<function main at 0x7fdd1e2e3d90>, 'x')),0
+CommunicationOpIdentifier(src_rank=1, dest_rank=0, comm_tag=(<function main at 0x7fdd1e2e3d90>, 'x')),0
+CommunicationOpIdentifier(src_rank=0, dest_rank=2, comm_tag=(<function main at 0x7fdd1e2e3d90>, 'y')),1
+CommunicationOpIdentifier(src_rank=2, dest_rank=1, comm_tag=(<function main at 0x7fdd1e2e3d90>, 'x')),0
+CommunicationOpIdentifier(src_rank=1, dest_rank=0, comm_tag=(<function main at 0x7fdd1e2e3d90>, 'y')),1
+CommunicationOpIdentifier(src_rank=2, dest_rank=1, comm_tag=(<function main at 0x7fdd1e2e3d90>, 'y')),1
+new test
+CommunicationOpIdentifier(src_rank=0, dest_rank=1, comm_tag=(<function main at 0x7f6fcafdbd90>, 'x')),0
+CommunicationOpIdentifier(src_rank=1, dest_rank=0, comm_tag=(<function main at 0x7f6fcafdbd90>, 'x')),0
+CommunicationOpIdentifier(src_rank=0, dest_rank=1, comm_tag=(<function main at 0x7f6fcafdbd90>, 'y')),1
+CommunicationOpIdentifier(src_rank=1, dest_rank=0, comm_tag=(<function main at 0x7f6fcafdbd90>, 'y')),1
+new test
+CommunicationOpIdentifier(src_rank=0, dest_rank=1, comm_tag=(<function main at 0x7f31cb06bd90>, 'x')),0
+CommunicationOpIdentifier(src_rank=1, dest_rank=0, comm_tag=(<function main at 0x7f31cb06bd90>, 'x')),0
+CommunicationOpIdentifier(src_rank=0, dest_rank=1, comm_tag=(<function main at 0x7f31cb06bd90>, 'y')),1
+CommunicationOpIdentifier(src_rank=1, dest_rank=0, comm_tag=(<function main at 0x7f31cb06bd90>, 'y')),1

@@ -1,0 +1,89 @@
+digraph computation {
+    node [shape=rectangle]
+    array_0 -> array_2 [label="_in0"]
+    array_1 -> array_2 [label="_in1"]
+    array -> array_3 [label="_in0"]
+    array_2 -> array_3 [label="_in1"]
+    array_3 -> array_4 [label="_in0"]
+    array_2 -> array_4 [label="_in1"]
+    array_4 -> array_5 [label="_in0"]
+    array_2 -> array_5 [label="_in1"]
+    array_5 -> out0_0
+    array_6 -> out1_0
+    array_13 -> out2_0
+    array_8 -> out3_0
+    array_11 -> out4_0
+    array_9 -> out5_0
+    array_10 -> out6_0
+    array_7 -> out7_0
+    array_12 -> out8_0
+    subgraph cluster_0 {
+        style=dashed
+        label="0"
+        array [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">DataWrapper</td></tr><tr><td border="0">addr:</td><td border="0"><FONT FACE='monospace'>0x7fac9df5f0a0</FONT></td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(3,_3)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">tags:</td><td border="0"><FONT FACE='monospace'>{}</FONT></td></tr><tr><td border="0">data:</td><td border="0"><FONT FACE='monospace'>[[0_0_0]<br/>_[0_0_0]<br/>_[0_0_0]]</FONT></td></tr></table>> style=filled fillcolor=deepskyblue]
+        array_0 [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">DataWrapper</td></tr><tr><td border="0">addr:</td><td border="0"><FONT FACE='monospace'>0x7fac9df5f040</FONT></td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(3,_3)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">tags:</td><td border="0"><FONT FACE='monospace'>{}</FONT></td></tr><tr><td border="0">data:</td><td border="0"><FONT FACE='monospace'>[[0_1_2]<br/>_[3_4_5]<br/>_[6_7_8]]</FONT></td></tr></table>> style=filled fillcolor=deepskyblue]
+        array_1 [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">DataWrapper</td></tr><tr><td border="0">addr:</td><td border="0"><FONT FACE='monospace'>0x7fac9df5f100</FONT></td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(3,_3)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">tags:</td><td border="0"><FONT FACE='monospace'>{}</FONT></td></tr><tr><td border="0">data:</td><td border="0"><FONT FACE='monospace'>[[0_1_2]<br/>_[3_4_5]<br/>_[6_7_8]]</FONT></td></tr></table>> style=filled fillcolor=deepskyblue]
+        array_6 [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">DataWrapper</td></tr><tr><td border="0">addr:</td><td border="0"><FONT FACE='monospace'>0x7fac9df5f280</FONT></td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(3,_3)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">tags:</td><td border="0"><FONT FACE='monospace'>{}</FONT></td></tr><tr><td border="0">data:</td><td border="0"><FONT FACE='monospace'>[[0_0_0]<br/>_[0_0_0]<br/>_[0_0_0]]</FONT></td></tr></table>> style=filled fillcolor=deepskyblue]
+        array_7 [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">DataWrapper</td></tr><tr><td border="0">addr:</td><td border="0"><FONT FACE='monospace'>0x7fac9df5f580</FONT></td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(3,_3)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">tags:</td><td border="0"><FONT FACE='monospace'>{}</FONT></td></tr><tr><td border="0">data:</td><td border="0"><FONT FACE='monospace'>[[0_0_0]<br/>_[0_0_0]<br/>_[0_0_0]]</FONT></td></tr></table>> style=filled fillcolor=deepskyblue]
+        array_8 [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">DataWrapper</td></tr><tr><td border="0">addr:</td><td border="0"><FONT FACE='monospace'>0x7fac9df5f400</FONT></td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(3,_3)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">tags:</td><td border="0"><FONT FACE='monospace'>{}</FONT></td></tr><tr><td border="0">data:</td><td border="0"><FONT FACE='monospace'>[[0_0_0]<br/>_[0_0_0]<br/>_[0_0_0]]</FONT></td></tr></table>> style=filled fillcolor=deepskyblue]
+        array_9 [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">DataWrapper</td></tr><tr><td border="0">addr:</td><td border="0"><FONT FACE='monospace'>0x7fac9df5f4c0</FONT></td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(3,_3)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">tags:</td><td border="0"><FONT FACE='monospace'>{}</FONT></td></tr><tr><td border="0">data:</td><td border="0"><FONT FACE='monospace'>[[0_0_0]<br/>_[0_0_0]<br/>_[0_0_0]]</FONT></td></tr></table>> style=filled fillcolor=deepskyblue]
+        array_10 [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">DataWrapper</td></tr><tr><td border="0">addr:</td><td border="0"><FONT FACE='monospace'>0x7fac9df5f520</FONT></td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(3,_3)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">tags:</td><td border="0"><FONT FACE='monospace'>{}</FONT></td></tr><tr><td border="0">data:</td><td border="0"><FONT FACE='monospace'>[[0_0_0]<br/>_[0_0_0]<br/>_[0_0_0]]</FONT></td></tr></table>> style=filled fillcolor=deepskyblue]
+        array_11 [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">DataWrapper</td></tr><tr><td border="0">addr:</td><td border="0"><FONT FACE='monospace'>0x7fac9df5f460</FONT></td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(3,_3)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">tags:</td><td border="0"><FONT FACE='monospace'>{}</FONT></td></tr><tr><td border="0">data:</td><td border="0"><FONT FACE='monospace'>[[0_0_0]<br/>_[0_0_0]<br/>_[0_0_0]]</FONT></td></tr></table>> style=filled fillcolor=deepskyblue]
+        array_12 [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">DataWrapper</td></tr><tr><td border="0">addr:</td><td border="0"><FONT FACE='monospace'>0x7fac9df5f5e0</FONT></td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(3,_3)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">tags:</td><td border="0"><FONT FACE='monospace'>{}</FONT></td></tr><tr><td border="0">data:</td><td border="0"><FONT FACE='monospace'>[[0_0_0]<br/>_[0_0_0]<br/>_[0_0_0]]</FONT></td></tr></table>> style=filled fillcolor=deepskyblue]
+        array_13 [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">DataWrapper</td></tr><tr><td border="0">addr:</td><td border="0"><FONT FACE='monospace'>0x7fac9df5f3a0</FONT></td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(3,_3)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">tags:</td><td border="0"><FONT FACE='monospace'>{}</FONT></td></tr><tr><td border="0">data:</td><td border="0"><FONT FACE='monospace'>[[0_0_0]<br/>_[0_0_0]<br/>_[0_0_0]]</FONT></td></tr></table>> style=filled fillcolor=deepskyblue]
+        array_2 [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">IndexLambda</td></tr><tr><td border="0">addr:</td><td border="0"><FONT FACE='monospace'>0x7fac9df07e60</FONT></td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(3,_3)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">tags:</td><td border="0"><FONT FACE='monospace'>{}</FONT></td></tr><tr><td border="0">expr:</td><td border="0"><FONT FACE='monospace'>_in0[_0,__1]*_in1[_0,__1]</FONT></td></tr></table>> style=filled fillcolor=white]
+        array_3 [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">IndexLambda</td></tr><tr><td border="0">addr:</td><td border="0"><FONT FACE='monospace'>0x7fac9df07df0</FONT></td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(3,_3)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">tags:</td><td border="0"><FONT FACE='monospace'>{}</FONT></td></tr><tr><td border="0">expr:</td><td border="0"><FONT FACE='monospace'>_in0[_0,__1]_+__in1[_0,__1]</FONT></td></tr></table>> style=filled fillcolor=white]
+        array_4 [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">IndexLambda</td></tr><tr><td border="0">addr:</td><td border="0"><FONT FACE='monospace'>0x7fac9df07ed0</FONT></td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(3,_3)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">tags:</td><td border="0"><FONT FACE='monospace'>{}</FONT></td></tr><tr><td border="0">expr:</td><td border="0"><FONT FACE='monospace'>_in0[_0,__1]_+__in1[_0,__1]</FONT></td></tr></table>> style=filled fillcolor=white]
+        array_5 [label=<<table border="0" cellborder="1" cellspacing="0">
+        <tr><td colspan="2" border="0">IndexLambda</td></tr><tr><td border="0">addr:</td><td border="0"><FONT FACE='monospace'>0x7fac9df07f40</FONT></td></tr><tr><td border="0">shape:</td><td border="0"><FONT FACE='monospace'>(3,_3)</FONT></td></tr><tr><td border="0">dtype:</td><td border="0"><FONT FACE='monospace'>int64</FONT></td></tr><tr><td border="0">tags:</td><td border="0"><FONT FACE='monospace'>{}</FONT></td></tr><tr><td border="0">expr:</td><td border="0"><FONT FACE='monospace'>_in0[_0,__1]_+__in1[_0,__1]</FONT></td></tr></table>> style=filled fillcolor=white]
+        array_5 -> out0
+        array_6 -> out1
+        array_7 -> out7
+        array_8 -> out3
+        array_9 -> out5
+        array_10 -> out6
+        array_11 -> out4
+        array_12 -> out8
+        array_13 -> out2
+        subgraph cluster_Part_outputs {
+            node [shape=ellipse]
+            label="Part outputs"
+            out0 [label="out0"]
+            out1 [label="out1"]
+            out7 [label="out7"]
+            out3 [label="out3"]
+            out5 [label="out5"]
+            out6 [label="out6"]
+            out4 [label="out4"]
+            out8 [label="out8"]
+            out2 [label="out2"]
+        }
+    }
+    subgraph cluster_Overall_outputs {
+        node [shape=ellipse]
+        label="Overall outputs"
+        out0_0 [label="out0"]
+        out1_0 [label="out1"]
+        out2_0 [label="out2"]
+        out3_0 [label="out3"]
+        out4_0 [label="out4"]
+        out5_0 [label="out5"]
+        out6_0 [label="out6"]
+        out7_0 [label="out7"]
+        out8_0 [label="out8"]
+    }
+}
