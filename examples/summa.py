@@ -18,6 +18,8 @@ import arraycontext
 import pytools
 from typing import Union
 
+import pdb # DEBUGGER
+
 class MyArrayContext(PytatoPyOpenCLArrayContext):
 
     def transform_loopy_program(self, t_unit):
@@ -41,16 +43,59 @@ class MyTagType(pytools.tag.Tag):
     def __repr__(self):
         return "P" + str(self.array_location)
 
+def get_rank(tags):
+    loc = None
+    for tag in tags:
+        if isinstance(tag, MyTagType):
+           loc = tag.get_location()
+    return loc
 
-class Mapper:
-    def __init__(self, dag_tagged_arrays):
-        # staple these to a result on the right rank at the end
-        self.rank_to_sends: Dict[int, List[DistributedSend]] = {}
-        self.map = dag_tagged_arrays
+class SliceyMapper(pt.transform.CopyMapper):
 
+    def __call__(self, expr, where_should_be):
+        return self.rec(expr, where_should_be)
 
-    def descendants(self, node):
-        return self.map[node]
+    def rec(self, expr, where_should_be):
+        return super().rec(expr, where_should_be)
+
+    def map_index_lambda(self, expr: pt.IndexLambda, where_should_be) -> pt.Array:
+          
+        loc = get_rank(expr.tags)
+        if loc != None and where_should_be != loc:
+           # Then we need to add in the communication and recurse.
+           bindings = immutabledict({
+              name: self.rec(subexpr, loc) for name, subexpr in sorted(expr.bindings.items())
+           })
+           descend = IndexLambda(expr=expr.expr, bindings=expr.bindings, tags=expr.tags)
+           return _set_up_send_receive(descend, where_should_be, loc)             
+        else:
+           return super().rec(expr,where_should_be) # This should call CopyMapper
+
+    def _set_up_send_recieve(self, descend, where_should_be: int, location_of_descend: int) -> pt.Array:
+
+        comm_id = get_comm_id(where_should_be, location_of_descend)
+        send = pt.make_distributed_send(descend, where_should_be, comm_id) # We are stating the destination we want to send to.
+        receive = pt.make_distributed_recv(location_of_descend, comm_id, descend.shape, descend.dtype)
+        return receive
+
+    def map_basic_index(self, expr: pt.BasicIndex, where_should_be) -> pt.Array:
+        rank = get_rank(expr.tags)
+        if rank != None and where_should_be != rank:
+            descend = self.rec(expr.array, rank)
+            return _set_up_send_recieve(descend, where_should_be, rank)
+        else:
+            return self.rec(expr.array, where_should_be)
+
+    def map_reshape(self, expr: pt.Reshape, where_should_be) -> pt.Array:
+        rank = get_rank(expr.tags)
+        if rank != None and where_should_be != rank:
+            descend = self.rec(expr.array, rank)
+            return _set_up_send_recieve(descend, where_should_be, rank)
+        else:
+            return self.rec(expr.array, where_should_be)
+             
+    def map_data_wrapper(self, expr: pt.DataWrapper, where_should_be) -> pt.Array:
+        return super().map_data_wrapper(expr)
 
 def main():
 
@@ -95,12 +140,15 @@ def main():
     B_blocks = slice_into_blocks(actx.from_numpy(B_in), blocksize=bs_B)
 	
 
-    def outer(a, b):
-        return a.reshape(-1, 1) * b.reshape(1, -1)
+    def outer(a, b, loc_):
+        t1 = a.reshape(-1,1).tagged([MyTagType(loc_)])
+        t2 = b.reshape(1,-1).tagged([MyTagType(loc_)])
+        return (t1 * t2).tagged([MyTagType(loc_)])
 
     C_blocks = np.zeros((A_blocks.shape[0], B_blocks.shape[1]), dtype=object)
     n_outer_product_blocks = B_blocks.shape[0]
     n_outer_products = B_blocks[0,0].shape[0]
+    print("N prod: ", n_outer_products, "blocks: ", n_outer_product_blocks)
     assert n_outer_product_blocks * n_outer_products == B_blocks.shape[0] * bs_B[0]
 
     print("shape: ",C_blocks.shape[0:2])
@@ -123,13 +171,12 @@ def main():
                     tagged1 = input1.tagged([MyTagType(processor_for_A)])
                     tagged2 = input2.tagged([MyTagType(processor_for_B)])
 
-                    op = outer(
-                        A_blocks[ib, k_op_block][:, k_op],
-                        B_blocks[k_op_block, jb][k_op])
+                    op = outer(tagged1, tagged2, processor_for_C)
                     C_blocks[ib, jb] = C_blocks[ib, jb] + op
                     C_blocks[ib, jb] = C_blocks[ib, jb].tagged([MyTagType(processor_for_C)])
                     print("C_blocks[ib,jb[: ",ib,jb,C_blocks[ib, jb])
-
+                    print("Processors (A,B,C):", processor_for_A, processor_for_B, processor_for_C)
+                    print("tagged1 in bindings: ", C_blocks[ib, jb].bindings)
     myMapper = transform.Mapper()
     for ib in range(C_blocks.shape[0]):
        for jb in range(C_blocks.shape[1]):
@@ -145,14 +192,25 @@ def main():
 
 
     my_scheduler_send_nodes = [[] for i in range(9)]
-    build_send_lists(C_blocks[0,0],my_scheduler_send_nodes)
+    my_graph = pt.get_dot_graph(C_blocks[1,0])
+    with open("out_file.out", "w+") as out_file:
+        out_file.write(my_graph)
 
-
-    print(my_scheduler_send_nodes)
+    mySlicer = SliceyMapper()
+    sliced = mySlicer.rec(C_blocks[0,0],1)
+    print("MY SLICER HAS SLICED")
+    print(sliced)
+    """
+    my_scheduler_send_nodes = [[] for i in range(9)]
+    for row_block in range(C_blocks.shape[0]):
+        for col_block in range(C_blocks.shape[1]):
+            build_send_lists(C_blocks[row_block, col_block], my_scheduler_send_nodes)
+            for i in range(len(my_scheduler_send_nodes)):
+                print("processor: ",i," has ",len(my_scheduler_send_nodes[i])," send nodes")
 
     C_blocks_host = actx.to_numpy(actx.freeze(C_blocks))
     #print(C_blocks_host)
-
+    """
 
 def build_send_lists(array, proc_ids_to_comm_ids):
 
@@ -165,26 +223,38 @@ def build_send_lists(array, proc_ids_to_comm_ids):
         for tag in next_array.tags:
             if isinstance(tag, MyTagType):
                 loc = tag.get_location()
-
-        if len(array.bindings) > 0:
-            print("\n",array.tags,"\n")
+        if isinstance(next_array,pt.Reshape):
+            # There is not a bindings attribute.
+            descend = next_array.array
+            for tag in descend.tags:
+                if type(tag) == MyTagType:
+                   your_loc = tag.get_location()
+                if your_loc is None:
+                   # is null then we are just going to add it onto the stack.
+                   stack.append(descend)
+                elif loc is None:
+                   # Missing data about the combine step.
+                   stack.append(descend)
+                elif loc != your_loc:
+                    # We are splitting this edge. This means that we need to make a Send/Receive pair.
+                    comm_id = tuple([your_loc, loc, len(proc_ids_to_comm_ids[your_loc]) + 1])
+                    send = pt.make_distributed_send(descend, loc, comm_id)
+                    receive = pt.make_distributed_recv(your_loc, comm_id, descend.shape, descend.dtype)
+                    proc_ids_to_comm_ids[your_loc].append(send)
+                    #next_array.array = receive
+                else:
+                    stack.append(descend)
             
-            print("the first array should be located at: ",loc)
+
+        if  hasattr(next_array,"bindings"):
             for key in next_array.bindings.keys():
                 your_loc = None
                 descend = next_array.bindings[key]
-                print(descend, "and tags: ", descend.tags)
-                for tag in descend.tags:
-                    print(MyTagType)
-                    print(type(tag))
-                    if type(tag) == MyTagType:
-                         your_loc = tag.get_location()
-                    else:
-                         print("Stated as no match. However, we have: ", MyTagType, " and the instant: ", type(tag))
-                    #if isinstance(tag, MyTagType):
-                    #     your_loc = tag.get_location()
-                #your_loc = next_array.bindings[key].tags.array_location
-                print("first depend is located at: ", your_loc)
+                if isinstance(descend, pt.IndexLambda) or isinstance(descend, pt.BasicIndex) or isinstance(descend, pt.Reshape):
+                    for tag in descend.tags:
+                        if type(tag) == MyTagType:
+                             your_loc = tag.get_location()
+                #breakpoint()
                 if your_loc is None:
                    # is null then we are just going to add it onto the stack.
                    stack.append(descend)
@@ -195,15 +265,12 @@ def build_send_lists(array, proc_ids_to_comm_ids):
                     # We are splitting this edge. This means that we need to make a Send/Receive pair.
                     comm_id = tuple([your_loc, loc, len(proc_ids_to_comm_ids[your_loc]) + 1])
                     send = pt.make_distributed_send(next_array.bindings[key], loc, comm_id)
-                    receive = pt.make_distributed_recv(your_loc, comm_id, next_array.bindings[key].shape)
+                    receive = pt.make_distributed_recv(your_loc, comm_id, next_array.bindings[key].shape, next_array.bindings[key].dtype)
                     proc_ids_to_comm_ids[your_loc].append(send)
+                    next_array.bindings[key] = receive
                 else:
-                    print(type(next_array.bindings[key]))
-                    if isinstance(next_array.bindings[key], pt.IndexLambda):
-                        stack.append(next_array.bindings[key])
+                    stack.append(next_array.bindings[key])
         cnt += 1
-        print("cnt: ", cnt)
-            # else we are good to keep going on this path.
     return
 
 def divide(array, my_dag, proc_of_interest: int):
