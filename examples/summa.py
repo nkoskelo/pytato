@@ -50,52 +50,67 @@ def get_rank(tags):
            loc = tag.get_location()
     return loc
 
-class SliceyMapper(pt.transform.CopyMapper):
+class SliceyMapper(pt.transform.CopyMapperWithExtraArgs):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.sends_global = dict()
+
+
+    def get_comm_id(self, where_you_want_it: int, its_location: int):
+        next_id = None # get scope right.
+        if where_you_want_it in self.sends_global.keys():
+            if its_location in self.sends_global[where_you_want_it].keys():
+                next_id = len(self.sends_global[where_you_want_it][its_location])
+            else:
+                next_id = 0
+            self.sends_global[where_you_want_it][its_location].append(tuple([next_id, where_you_want_it, its_location]))
+
+        else:
+            # Need to set up this portion of the global.
+            self.sends_global[where_you_want_it] = dict()
+            self.sends_global[where_you_want_it][its_location] = [tuple([next_id, where_you_want_it, its_location])]
+        return tuple([next_id, where_you_want_it, its_location])
+
+    def add_send_node_to_global(self, send_node, comm_id):
+        id_number, dest_rank, src_rank = comm_id
+        if dest_rank in self.sends_global.keys():
+             if src_rank in self.sends_global[dest_rank].keys():
+                 self.sends_global[dest_rank][src_rank][id_number] = tuple([id_number, dest_rank, src_rank, send_node])
+                 return
+        assert False # We should never hit this portion as the global should always already be populated.
+
 
     def __call__(self, expr, where_should_be):
         return self.rec(expr, where_should_be)
 
     def rec(self, expr, where_should_be):
-        return super().rec(expr, where_should_be)
-
-    def map_index_lambda(self, expr: pt.IndexLambda, where_should_be) -> pt.Array:
-          
         loc = get_rank(expr.tags)
-        if loc != None and where_should_be != loc:
-           # Then we need to add in the communication and recurse.
-           bindings = immutabledict({
-              name: self.rec(subexpr, loc) for name, subexpr in sorted(expr.bindings.items())
-           })
-           descend = IndexLambda(expr=expr.expr, bindings=expr.bindings, tags=expr.tags)
-           return _set_up_send_receive(descend, where_should_be, loc)             
+        if loc != where_should_be and loc != None:
+            # Then, we are going to need to split the system.
+
+            comm_id = self.get_comm_id(where_should_be, loc)
+            descend = super().rec(expr, where_should_be)
+            send = pt.make_distributed_send(descend, where_should_be, comm_id)
+            receive = pt.make_distributed_recv(loc, comm_id, descend.shape, descend.dtype)
+            self.add_send_node_to_global(send, comm_id)
+            return receive
         else:
-           return super().rec(expr,where_should_be) # This should call CopyMapper
+            return super().rec(expr, where_should_be)
 
-    def _set_up_send_recieve(self, descend, where_should_be: int, location_of_descend: int) -> pt.Array:
+    """
+    def map_index_lambda(self, expr: pt.IndexLambda, where_should_be):
+        return super().map_index_lambda(expr, where_should_be)
 
-        comm_id = get_comm_id(where_should_be, location_of_descend)
-        send = pt.make_distributed_send(descend, where_should_be, comm_id) # We are stating the destination we want to send to.
-        receive = pt.make_distributed_recv(location_of_descend, comm_id, descend.shape, descend.dtype)
-        return receive
+    def map_basic_index(self, expr: pt.BasicIndex, where_should_be):
+        return super().map_basic_index(expr, where_should_be)
 
-    def map_basic_index(self, expr: pt.BasicIndex, where_should_be) -> pt.Array:
-        rank = get_rank(expr.tags)
-        if rank != None and where_should_be != rank:
-            descend = self.rec(expr.array, rank)
-            return _set_up_send_recieve(descend, where_should_be, rank)
-        else:
-            return self.rec(expr.array, where_should_be)
+    def map_reshape(self, expr, where_should_be):
+        return super().map_reshape(expr, where_should_be)
 
-    def map_reshape(self, expr: pt.Reshape, where_should_be) -> pt.Array:
-        rank = get_rank(expr.tags)
-        if rank != None and where_should_be != rank:
-            descend = self.rec(expr.array, rank)
-            return _set_up_send_recieve(descend, where_should_be, rank)
-        else:
-            return self.rec(expr.array, where_should_be)
-             
-    def map_data_wrapper(self, expr: pt.DataWrapper, where_should_be) -> pt.Array:
-        return super().map_data_wrapper(expr)
+    def map_data_wrapper(self, expr, where_should_be):
+        return super().map_data_wrapper(expr, where_should_be)
+    """
 
 def main():
 
@@ -196,6 +211,9 @@ def main():
     with open("out_file.out", "w+") as out_file:
         out_file.write(my_graph)
 
+    print()
+    print("GOING INTO THE SLICER")
+    print()
     mySlicer = SliceyMapper()
     sliced = mySlicer.rec(C_blocks[0,0],1)
     print("MY SLICER HAS SLICED")
