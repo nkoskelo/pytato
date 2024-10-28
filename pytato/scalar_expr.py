@@ -115,7 +115,6 @@ class CombineMapper(CombineMapperBase):
                              self.rec(expr.inner_expr, *args, **kwargs)])
 
 
-
 class IdentityMapper(IdentityMapperBase):
     def map_reduce(self, expr: Reduce, *args: Any, **kwargs: Any) -> Any:
         return Reduce(
