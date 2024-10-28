@@ -106,10 +106,14 @@ class WalkMapper(WalkMapperBase):
 
 
 class CombineMapper(CombineMapperBase):
+    def map_type_cast(self, expr: TypeCast, *args: Any, **kwargs: Any) -> Any:
+        return self.rec(expr.inner_expr)
+
     def map_reduce(self, expr: Reduce, *args: Any, **kwargs: Any) -> Any:
         return self.combine([*(self.rec(bnd, *args, **kwargs)
                                for _, bnd in sorted(expr.bounds.items())),
                              self.rec(expr.inner_expr, *args, **kwargs)])
+
 
 
 class IdentityMapper(IdentityMapperBase):
@@ -339,5 +343,12 @@ def get_reduction_induction_variables(expr: prim.Expression) -> frozenset[str]:
     Returns the induction variables for the reduction nodes.
     """
     return InductionVariableCollector()(expr)  # type: ignore[no-any-return]
+
+
+def contains_reduction(expr: prim.Expression) -> bool:
+    """
+    Returns True if the expression contains a reduction operation.
+    """
+    return len(get_reduction_induction_variables(expr)) > 0
 
 # vim: foldmethod=marker
