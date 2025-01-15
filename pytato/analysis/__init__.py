@@ -26,7 +26,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any
 
 from loopy.tools import LoopyKeyBuilder
@@ -47,12 +46,14 @@ from pytato.array import (
     Stack,
 )
 from pytato.function import Call, FunctionDefinition, NamedCallResult
-from pytato.loopy import LoopyCall
 from pytato.transform import ArrayOrNames, CachedWalkMapper, Mapper
 
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from pytato.distributed.nodes import DistributedRecv, DistributedSendRefHolder
+    from pytato.loopy import LoopyCall
 
 __doc__ = """
 .. currentmodule:: pytato.analysis
@@ -582,7 +583,9 @@ class PytatoKeyBuilder(LoopyKeyBuilder):
         self.rec(key_hash, key.data.tobytes())
 
     def update_for_TaggableCLArray(self, key_hash: Any, key: Any) -> None:
-        from arraycontext.impl.pyopencl.taggable_cl_array import TaggableCLArray
+        from arraycontext.impl.pyopencl.taggable_cl_array import (  # pylint: disable=import-error
+            TaggableCLArray,
+        )
         assert isinstance(key, TaggableCLArray)
         self.rec(key_hash, key.get())
 
