@@ -47,6 +47,7 @@ from typing import (
     Never,
     ParamSpec,
     TypeAlias,
+    TypeVar,
 )
 
 from bidict import bidict

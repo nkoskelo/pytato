@@ -1939,6 +1939,26 @@ class ParameterStudyDataWrapper(DataWrapper):
 
     studies: tuple[ParameterStudyAxisTag, ...]
 
+    
+    def _canonical_ordered_studies_to_shapes_and_axes(
+            self) -> tuple[list[int], list[Axis]]:
+        """
+        Get the shapes and axes in the canonical ordering.
+        """
+
+        return [study.size for study in self.studies], \
+                [Axis(tags=frozenset((study,))) for study in self.studies]
+
+    def convert_to_data_wrapper(self) -> DataWrapper:
+    
+        end_shape, end_axes = self._canonical_ordered_studies_to_shapes_and_axes()
+
+        return DataWrapper(data=self.data,
+                           shape=(*self.shape, *end_shape),
+                           axes =(*self.axes, *end_axes),
+                           tags = self.tags,
+                           non_equality_tags = self.non_equality_tags)
+        
 
 # {{{ placeholder
 
@@ -2358,6 +2378,19 @@ def make_data_wrapper(data: DataInterface,
     if len(axes) != len(shape):
         raise ValueError("'axes' dimensionality mismatch:"
                          f" expected {len(shape)}, got {len(axes)}.")
+
+    parameter_studies: tuple[ParameterStudyAxisTag, ...] = ()
+    for ax in axes:
+        if ax.tags_of_type(ParameterStudyAxisTag):
+            parameter_studies = (*parameter_studies,
+                                 list(ax.tags_of_type(ParameterStudyAxisTag))[0])
+    
+    if parameter_studies:
+        num_studies = len(parameter_studies)
+        return ParameterStudyDataWrapper(data=data, shape=shape[:num_studies],
+                                         axes=axes[:num_studies], tags=(tags | _get_default_tags()),
+                                         non_equality_tags=_get_created_at_tag(),
+                                         studies = parameter_studies)
 
     return DataWrapper(data, shape, axes=axes, tags=(tags | _get_default_tags()),
                        non_equality_tags=_get_created_at_tag(),)
