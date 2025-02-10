@@ -92,7 +92,7 @@ ScalarExpression = ArithmeticExpression | Bool
 
 
 def is_integral_scalar_expression(expr: object) -> TypeIs[IntegralScalarExpression]:
-    return isinstance(expr, int | np.integer) or isinstance(expr, prim.ExpressionNode)
+    return isinstance(expr, int | np.integer | prim.ExpressionNode)
 
 
 def parse(s: str) -> ScalarExpression:
@@ -163,9 +163,8 @@ class SubstitutionMapper(SubstitutionMapperBase):
                            for name, bound in expr.bounds.items()}))
 
 
-IDX_LAMBDA_RE = re.compile("^(_r?(0|([1-9][0-9]*)))$")
-IDX_LAMBDA_INAME = re.compile("^(_(0|([1-9][0-9]*)))$")
-IDX_LAMBDA_JUST_REDUCTIONS = re.compile("^(_r(0|([1-9][0-9]*)))$")
+IDX_LAMBDA_REDUCTION_AXIS_INDEX = re.compile(r"^(_r?(?P<index>0|[1-9][0-9]*))$")
+IDX_LAMBDA_AXIS_INDEX = re.compile(r"^(_(?P<index>0|[1-9][0-9]*))$")
 
 
 class DependencyMapper(DependencyMapperBase[P]):
@@ -187,7 +186,7 @@ class DependencyMapper(DependencyMapperBase[P]):
                 expr: prim.Variable, *args: P.args, **kwargs: P.kwargs
             ) -> DependenciesT:
         if ((not self.include_idx_lambda_indices)
-                and IDX_LAMBDA_RE.fullmatch(str(expr))):
+                and IDX_LAMBDA_REDUCTION_AXIS_INDEX.fullmatch(str(expr))):
             return set()
         else:
             return super().map_variable(expr, *args, **kwargs)
