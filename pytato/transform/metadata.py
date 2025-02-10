@@ -47,7 +47,6 @@ from typing import (
     Never,
     ParamSpec,
     TypeAlias,
-    TypeVar,
 )
 
 from bidict import bidict
@@ -144,8 +143,6 @@ class BindingSubscriptsCollector(CombineMapper[dict[BindingName,
 # }}}
 
 # {{{ AxesTagsEquationCollector
-
-
 class AxesTagsEquationCollector(Mapper[None, Never, []]):
     r"""
     Records equations arising from operand/output axes equivalence for an array
@@ -270,6 +267,7 @@ class AxesTagsEquationCollector(Mapper[None, Never, []]):
     map_placeholder = _map_input_base
     map_data_wrapper = _map_input_base
     map_size_param = _map_input_base
+
     def map_index_lambda(self, expr: IndexLambda) -> None:
         for bnd in expr.bindings.values():
             self.rec(bnd)

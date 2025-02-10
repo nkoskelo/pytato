@@ -1916,6 +1916,29 @@ class DataWrapper(_SuppliedAxesAndTagsMixin, InputArgumentBase):
 
 # }}}
 
+from pytools.tag import UniqueTag
+from dataclasses import dataclass
+dataclass(repr=True, eq=True)
+class ParameterStudyAxisTag(UniqueTag):
+    """
+    A tag to indicate that the axis is being used
+    for independent trials like in a parameter study.
+    If you want to vary multiple input variables in the
+    same study then you need to have the same type of
+    :class:`ParameterStudyAxisTag`.
+    """
+    def __init__(self, size:int):
+        super().__init__()
+        self.size = size
+# {{{ ParameterStudy Datawrapper. 
+@array_dataclass(hash=False)
+class ParameterStudyDataWrapper(DataWrapper):
+    """
+    A data wrapper which contains some parameters which need to be expanded.
+    """
+
+    studies: tuple[ParameterStudyAxisTag, ...]
+
 
 # {{{ placeholder
 
