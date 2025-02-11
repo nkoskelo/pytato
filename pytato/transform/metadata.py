@@ -55,7 +55,7 @@ from bidict import bidict
 import pymbolic.primitives as prim
 from pymbolic.typing import Expression
 from pytools import UniqueNameGenerator
-from pytools.tag import Tag
+from pytools.tag import Tag, Taggable
 
 from pytato.array import (
     AbstractResultWithNamedArrays,
@@ -64,6 +64,7 @@ from pytato.array import (
     AxisPermutation,
     BasicIndex,
     Concatenate,
+    DataWrapper,
     DictOfNamedArrays,
     Einsum,
     EinsumReductionAxis,
@@ -268,8 +269,18 @@ class AxesTagsEquationCollector(Mapper[None, Never, []]):
         """
 
     map_placeholder = _map_input_base
-    map_data_wrapper = _map_input_base
     map_size_param = _map_input_base
+
+    def map_data_wrapper(self, expr: DataWrapper) -> None:
+        """
+        A :class:`pytato.DataWrapper` has one potentially tagged or taggable input.
+        """
+        if isinstance(expr.data, Taggable):
+            # We can add a propagation equation between the axes of the input data
+            # and the wrapper object.
+            for axis_ind in range(len(expr.data.shape)):
+                self.record_equation(self.get_var_for_axis(expr, axis_ind),
+                                     self.get_var_for_axis(expr.data, axis_ind))
 
     def map_index_lambda(self, expr: IndexLambda) -> None:
         for bnd in expr.bindings.values():
