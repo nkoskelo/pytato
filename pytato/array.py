@@ -1951,11 +1951,18 @@ class ParameterStudyDataWrapper(DataWrapper):
 
     def convert_to_data_wrapper(self) -> DataWrapper:
     
-        end_shape, end_axes = self._canonical_ordered_studies_to_shapes_and_axes()
+        _, end_axes = self._canonical_ordered_studies_to_shapes_and_axes()
+
+        num_studies = len(end_axes)
+        axes: tuple[Axis, ...] = (self.data.axes[ind] for ind in
+                                  range(len(self.data.axes) - num_studies))
+        axes = (*axes, *end_axes)
+
+        shape = self.data.shape
 
         return DataWrapper(data=self.data,
-                           shape=(*self.shape, *end_shape),
-                           axes =(*self.axes, *end_axes),
+                           shape=shape,
+                           axes =axes,
                            tags = self.tags,
                            non_equality_tags = self.non_equality_tags)
         
